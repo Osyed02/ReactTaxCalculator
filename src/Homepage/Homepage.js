@@ -5,70 +5,112 @@ import DisplayTax from '../components/DisplayTax';
 export default function Homepage() {
 
     const [allData, setAllData] = useState({ monthlyIncome: null, yearlyIncome: null, monthlyTax: null, salAfterTax: null, yearlyIncomeAfterTax: null, yearlyTax: null })
+    const minimumIncome = 600000;
+
+    const [myAdditionalTax] = useState({
+        slab0: 0,
+        slab1: 10000,
+        slab2: 100000,
+        slab3: 200000,
+        slab4: 400000,
+        slab5: 1000000,
+        slab6: 2000000,
+    })
+    const [myTaxPercent] = useState({
+        slab0: 0,
+        slab1: 2.5,
+        slab2: 12.5,
+        slab3: 20,
+        slab4: 25,
+        slab5: 32.5,
+        slab6: 35,
+    })
+    const [mySlabs] = useState({
+        slab0: 0,
+        slab1: 600000,
+        slab2: 1200000,
+        slab3: 2400000,
+        slab4: 3600000,
+        slab5: 6000000,
+        slab6: 12000000
+    })
+
 
     const calculateTax = () => {
-
-        const minIncome = 600000;
-        const slab0 = 600000;
-        const slab1 = 1200000;
-        const slab2 = 2400000;
-        const slab3 = 3600000;
-        const slab4 = 6000000;
-        const slab5 = 12000000;
-
         const yearlyIncome = allData.monthlyIncome * 12;
 
         const checkTax = (additTax, taxPercent, minIncome) => {
             const exceededAmount = yearlyIncome - minIncome;
             let yearlyTax = (exceededAmount / 100) * taxPercent;
-            yearlyTax = yearlyTax + additTax;
-            const monthlyTax = yearlyTax / 12;
+            yearlyTax = Math.ceil(yearlyTax + additTax);
+            const monthlyTax = Math.ceil(yearlyTax / 12);
             const salAfterTax = allData.monthlyIncome - monthlyTax;
             const yearlyIncomeAfterTax = yearlyIncome - yearlyTax;
             setAllData({ ...allData, yearlyIncome: yearlyIncome, yearlyTax: yearlyTax, monthlyTax: monthlyTax, salAfterTax: salAfterTax, yearlyIncomeAfterTax: yearlyIncomeAfterTax });
         }
 
-        if (yearlyIncome > minIncome) {
 
-            if (yearlyIncome < slab1) {
-                const minIncome = slab0;
-                checkTax(0, 2.5, minIncome);
-            }
-            else if (yearlyIncome < slab2) {
-                const minIncome = slab1;
-                checkTax(15000, 12.5, minIncome);
-            }
-            else if (yearlyIncome < slab3) {
-                const minIncome = slab2;
-                checkTax(165000, 20, minIncome);
-            }
-            else if (yearlyIncome < slab4) {
-                const minIncome = slab3;
-                checkTax(405000, 25, minIncome);
-            }
-            else if (yearlyIncome < slab5) {
-                const minIncome = slab4;
-                checkTax(1005000, 32, minIncome);
-            } else {
-                const minIncome = slab5;
-                checkTax(2955000, 35, minIncome);
-            }
+        switch (true) {
+            case (yearlyIncome > minimumIncome):
+                switch (true) {
+                    case (yearlyIncome > mySlabs.slab1):
+                        checkTax(
+                            myAdditionalTax.slab0,
+                            myTaxPercent.slab1,
+                            mySlabs.slab1);
+                        break;
+                    case (yearlyIncome > mySlabs.slab2):
+                        checkTax(
+                            myAdditionalTax.slab1,
+                            myTaxPercent.slab2,
+                            mySlabs.slab2);
+                        break;
+                    case (yearlyIncome > mySlabs.slab3):
+                        checkTax(
+                            myAdditionalTax.slab2,
+                            myTaxPercent.slab3,
+                            mySlabs.slab3);
+                        break;
+                    case (yearlyIncome > mySlabs.slab4):
+                        checkTax(
+                            myAdditionalTax.slab3,
+                            myTaxPercent.slab4,
+                            mySlabs.slab4);
+                        break;
+                    case (yearlyIncome > mySlabs.slab5):
+                        checkTax(
+                            myAdditionalTax.slab4,
+                            myTaxPercent.slab5,
+                            mySlabs.slab5);
+                        break;
 
-        } else {
-            const minIncome = slab0;
-            checkTax(0, 0, minIncome);
+                    default:
+                        checkTax(
+                            myAdditionalTax.slab6,
+                            myTaxPercent.slab6,
+                            mySlabs.slab6);
+                        break;
+                }
+                break;
+
+            default:
+                checkTax(myAdditionalTax.slab0, myTaxPercent.slab0, mySlabs.slab0);
+                break;
         }
 
     }
 
-
+    const numbersOnly = /^[0-9\b]*$/;
     const handleChange = (e) => {
-        setAllData({ ...allData, monthlyIncome: e.target.value })
+        if (numbersOnly.test(e.target.value)) {
+            setAllData({ ...allData, monthlyIncome: e.target.value })
+        }
     }
 
     useEffect(() => {
         calculateTax();
-    }, [handleChange])
+    }, [allData.monthlyIncome])
+
 
     return (
         <div>
@@ -83,6 +125,7 @@ export default function Homepage() {
                 <Card style={{ width: "100%", height: "100%" }}>
                     <Input
                         style={{ width: '100%' }}
+                        maxLength={11}
                         type={'text'}
                         prefix="Enter your Monthly Income | "
                         placeholder='Your Monthly Salary'
@@ -101,6 +144,6 @@ export default function Homepage() {
                     </ul>
                 </Card>
             </div>
-        </div>
+        </div >
     )
 }
