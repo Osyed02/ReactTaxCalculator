@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Input, Card, message } from 'antd';
+import React, { useEffect, useState } from 'react'
+import { Input, Card } from 'antd';
 import DisplayTax from '../components/DisplayTax';
 
 export default function Homepage() {
@@ -9,6 +9,7 @@ export default function Homepage() {
     const calculateTax = () => {
 
         const minIncome = 600000;
+        const slab0 = 600000;
         const slab1 = 1200000;
         const slab2 = 2400000;
         const slab3 = 3600000;
@@ -17,77 +18,7 @@ export default function Homepage() {
 
         const yearlyIncome = allData.monthlyIncome * 12;
 
-        if (yearlyIncome > minIncome) {
-
-            if (yearlyIncome < slab1) {
-                const additTax = 0;
-                const taxPercent = 2.5;
-                const exceededAmount = yearlyIncome - minIncome;
-                let yearlyTax = (exceededAmount / 100) * taxPercent;
-                yearlyTax = yearlyTax + additTax;
-                const monthlyTax = yearlyTax / 12;
-                const salAfterTax = allData.monthlyIncome - monthlyTax;
-                const yearlyIncomeAfterTax = yearlyIncome - yearlyTax;
-                setAllData({ ...allData, yearlyIncome: yearlyIncome, yearlyTax: yearlyTax, monthlyTax: monthlyTax, salAfterTax: salAfterTax, yearlyIncomeAfterTax: yearlyIncomeAfterTax });
-            }
-            else if (yearlyIncome < slab2) {
-                const additTax = 15000;
-                const taxPercent = 12.5;
-                const exceededAmount = yearlyIncome - slab1;
-                let yearlyTax = (exceededAmount / 100) * taxPercent;
-                yearlyTax = yearlyTax + additTax;
-                const monthlyTax = yearlyTax / 12;
-                const salAfterTax = allData.monthlyIncome - monthlyTax;
-                const yearlyIncomeAfterTax = yearlyIncome - yearlyTax;
-                setAllData({ ...allData, yearlyIncome: yearlyIncome, yearlyTax: yearlyTax, monthlyTax: monthlyTax, salAfterTax: salAfterTax, yearlyIncomeAfterTax: yearlyIncomeAfterTax });
-            }
-            else if (yearlyIncome < slab3) {
-                const additTax = 165000;
-                const taxPercent = 20;
-                const exceededAmount = yearlyIncome - slab2;
-                let yearlyTax = (exceededAmount / 100) * taxPercent;
-                yearlyTax = yearlyTax + additTax;
-                const monthlyTax = yearlyTax / 12;
-                const salAfterTax = allData.monthlyIncome - monthlyTax;
-                const yearlyIncomeAfterTax = yearlyIncome - yearlyTax;
-                setAllData({ ...allData, yearlyIncome: yearlyIncome, yearlyTax: yearlyTax, monthlyTax: monthlyTax, salAfterTax: salAfterTax, yearlyIncomeAfterTax: yearlyIncomeAfterTax });
-            }
-            else if (yearlyIncome < slab4) {
-                const additTax = 405000;
-                const taxPercent = 25;
-                const exceededAmount = yearlyIncome - slab3;
-                let yearlyTax = (exceededAmount / 100) * taxPercent;
-                yearlyTax = yearlyTax + additTax;
-                const monthlyTax = yearlyTax / 12;
-                const salAfterTax = allData.monthlyIncome - monthlyTax;
-                const yearlyIncomeAfterTax = yearlyIncome - yearlyTax;
-                setAllData({ ...allData, yearlyIncome: yearlyIncome, yearlyTax: yearlyTax, monthlyTax: monthlyTax, salAfterTax: salAfterTax, yearlyIncomeAfterTax: yearlyIncomeAfterTax });
-            }
-            else if (yearlyIncome < slab5) {
-                const additTax = 1005000;
-                const taxPercent = 32;
-                const exceededAmount = yearlyIncome - slab4;
-                let yearlyTax = (exceededAmount / 100) * taxPercent;
-                yearlyTax = yearlyTax + additTax;
-                const monthlyTax = yearlyTax / 12;
-                const salAfterTax = allData.monthlyIncome - monthlyTax;
-                const yearlyIncomeAfterTax = yearlyIncome - yearlyTax;
-                setAllData({ ...allData, yearlyIncome: yearlyIncome, yearlyTax: yearlyTax, monthlyTax: monthlyTax, salAfterTax: salAfterTax, yearlyIncomeAfterTax: yearlyIncomeAfterTax });
-            } else {
-                const additTax = 2955000;
-                const taxPercent = 35;
-                const exceededAmount = yearlyIncome - slab5;
-                let yearlyTax = (exceededAmount / 100) * taxPercent;
-                yearlyTax = yearlyTax + additTax;
-                const monthlyTax = yearlyTax / 12;
-                const salAfterTax = allData.monthlyIncome - monthlyTax;
-                const yearlyIncomeAfterTax = yearlyIncome - yearlyTax;
-                setAllData({ ...allData, yearlyIncome: yearlyIncome, yearlyTax: yearlyTax, monthlyTax: monthlyTax, salAfterTax: salAfterTax, yearlyIncomeAfterTax: yearlyIncomeAfterTax });
-            }
-
-        } else {
-            const additTax = 0;
-            const taxPercent = 0;
+        const checkTax = (additTax, taxPercent, minIncome) => {
             const exceededAmount = yearlyIncome - minIncome;
             let yearlyTax = (exceededAmount / 100) * taxPercent;
             yearlyTax = yearlyTax + additTax;
@@ -95,18 +26,49 @@ export default function Homepage() {
             const salAfterTax = allData.monthlyIncome - monthlyTax;
             const yearlyIncomeAfterTax = yearlyIncome - yearlyTax;
             setAllData({ ...allData, yearlyIncome: yearlyIncome, yearlyTax: yearlyTax, monthlyTax: monthlyTax, salAfterTax: salAfterTax, yearlyIncomeAfterTax: yearlyIncomeAfterTax });
-            message.error('To pay Tax, Minimum yearly Income must be more than 60,0000');
         }
 
+        if (yearlyIncome > minIncome) {
 
+            if (yearlyIncome < slab1) {
+                const minIncome = slab0;
+                checkTax(0, 2.5, minIncome);
+            }
+            else if (yearlyIncome < slab2) {
+                const minIncome = slab1;
+                checkTax(15000, 12.5, minIncome);
+            }
+            else if (yearlyIncome < slab3) {
+                const minIncome = slab2;
+                checkTax(165000, 20, minIncome);
+            }
+            else if (yearlyIncome < slab4) {
+                const minIncome = slab3;
+                checkTax(405000, 25, minIncome);
+            }
+            else if (yearlyIncome < slab5) {
+                const minIncome = slab4;
+                checkTax(1005000, 32, minIncome);
+            } else {
+                const minIncome = slab5;
+                checkTax(2955000, 35, minIncome);
+            }
 
+        } else {
+            const minIncome = slab0;
+            checkTax(0, 0, minIncome);
+        }
 
     }
-    const btnCalc = () => {
-        return (
-            <button onClick={calculateTax} className='btn btn-outline-dark shadow-none'>Check</button>
-        )
+
+
+    const handleChange = (e) => {
+        setAllData({ ...allData, monthlyIncome: e.target.value })
     }
+
+    useEffect(() => {
+        calculateTax();
+    }, [handleChange])
 
     return (
         <div>
@@ -123,10 +85,9 @@ export default function Homepage() {
                         style={{ width: '100%' }}
                         type={'text'}
                         prefix="Enter your Monthly Income | "
-                        suffix={btnCalc()}
                         placeholder='Your Monthly Salary'
                         value={allData.monthlyIncome}
-                        onChange={e => setAllData({ ...allData, monthlyIncome: e.target.value })}
+                        onChange={handleChange}
                     />
                     <br />
                     <br />
